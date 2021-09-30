@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Text;
 using Newtonsoft.Json;
 
@@ -257,6 +258,56 @@ namespace projet_pizza
             File.WriteAllText(pathAndFilename, json);
         }
 
+        static List<Pizza> DeserialisationJson(string jsonFile)
+        {
+
+            List<Pizza> ListePizza = null;
+            try
+            {
+                ListePizza = JsonConvert.DeserializeObject<List<Pizza>>(jsonFile);
+
+                return ListePizza;
+            }
+            catch
+            {
+                Console.WriteLine("Erreur : les données json ne sont pas valides");
+                return null;
+            }
+
+        }
+
+
+        static List<Pizza> GetPizzasFromUrl(string url)
+        {
+
+            // Etablissement connection
+            var webclient = new WebClient();
+
+            //Telechargement du fichier et stockage dans le repertoire specifier
+            string json = null;
+            try
+            {
+               json = webclient.DownloadString(url);
+            }
+            catch 
+            {
+                Console.WriteLine("Erreur réseau");
+                return null;
+            }
+            
+
+            // Lecture du fichier
+            //string texteFromJson= File.ReadAllText(json);
+
+            // Deserialisation du fichier
+
+            var listePizzas = DeserialisationJson(json);
+
+
+
+            return listePizzas;
+        }
+
 
         static void Main(string[] args)
         {
@@ -264,18 +315,25 @@ namespace projet_pizza
 
             string filename = "pizzas.json";
 
+            string url = "https://codeavecjonathan.com/res/pizzas2.json";
 
-           //var listePizza = GetPizzaFromCode();
 
-           // GenerateJsonFile(listePizza,filename);
+            //var listePizza = GetPizzaFromCode();
 
-           var listePizza = GetPizzaFromFile(filename);
-            
+            // GenerateJsonFile(listePizza,filename);
 
-            foreach (Pizza pizza in listePizza)
+            //var listePizza = GetPizzaFromFile(filename);
+
+            var listePizza = GetPizzasFromUrl(url);
+
+            if (listePizza != null)
             {
-                pizza.Afficher();
+                foreach (Pizza pizza in listePizza)
+                {
+                    pizza.Afficher();
+                }
             }
+            
 
 
             /*
