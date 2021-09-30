@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
+using Newtonsoft.Json;
 
 namespace projet_pizza
 {
@@ -12,7 +14,7 @@ namespace projet_pizza
 
 
 
-        protected string nom;
+        public string nom { get; protected set; }
         public float prix { get; protected set; }
         public bool vegetarienne { get; private set; }
         public List<string> ingredients { get; protected set; }
@@ -155,9 +157,66 @@ namespace projet_pizza
                 new Pizza("Marguerite", 4.3f, true, new List<string>{"cantal", "mozzarella", "fromage de chèvre", "poulet"}),
                 new Pizza("Tomate", 20.5f, false, new List<string>{"cantal", "mozzarella", "miel", "poulet" }),
                 new Pizza("Complete", 4.5f, true, new List<string>{"cantal", "mozzarella", "fromage de chèvre", "poulet", "tomates" }),
-                new PizzaPersonalisee(),
-                new PizzaPersonalisee()
+                //new PizzaPersonalisee(),
+                //new PizzaPersonalisee()
             };
+
+            //Serialisation de la listePizza
+
+            string json = JsonConvert.SerializeObject(listePizza);
+
+            // Ecriture de json dans un fichier de notre repertoire source
+
+            string path = "out";
+            string filename = "monfichierjson.json";
+
+            if (!File.Exists(path))
+            {
+                Directory.CreateDirectory(path);
+            }
+
+            string pathAndFilename = Path.Combine(path, filename);
+
+            File.WriteAllText(pathAndFilename, json);
+
+
+
+
+            // Lire le fichier "monfichierjson.json"
+            string jsonFichier = null;
+
+            try
+            {
+                jsonFichier = File.ReadAllText(pathAndFilename);
+            }
+            catch 
+            {
+                Console.WriteLine("Erreur de lecture du fichier : " + filename);
+                return;
+            }
+
+
+
+            // Deserialisation du fichier "monfichierjson.json" dans le repertoire
+            var jsonListePizza = new List<Pizza>();
+            try
+            {
+                jsonListePizza = JsonConvert.DeserializeObject<List<Pizza>>(jsonFichier);
+            }
+            catch 
+            {
+                Console.WriteLine( "Erreur : les données json ne sont pas valides" );
+                return;
+            }
+
+            
+
+            foreach (Pizza pizza in jsonListePizza)
+            {
+                pizza.Afficher();
+            }
+
+
 
             // Afficher les pizzas par ordre des prix
             //listePizza = listePizza.OrderBy(p => p.prix).ToList();
