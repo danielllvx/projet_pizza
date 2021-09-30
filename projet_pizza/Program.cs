@@ -142,15 +142,11 @@ namespace projet_pizza
 
     class Program
     {
-        static void Main(string[] args)
+
+
+
+        static List<Pizza> GetPizzaFromCode()
         {
-            Console.OutputEncoding = Encoding.UTF8;
-
-
-            // var pizza1 = new Pizza("4 fromages", 11.5f, true);
-
-            // pizza1.Afficher();
-
             var listePizza = new List<Pizza> {
                 new Pizza("4 fromages", 11.5f, true, new List<string>{"cantal", "mozzarella", "fromage de chèvre", "poulet", "tomate" }),
                 new Pizza("Indienne", 13.5f, false, new List<string>{"cantal", "mozzarella", "fromage de chèvre", "poulet", "tomate" }),
@@ -160,63 +156,6 @@ namespace projet_pizza
                 //new PizzaPersonalisee(),
                 //new PizzaPersonalisee()
             };
-
-            //Serialisation de la listePizza
-
-            string json = JsonConvert.SerializeObject(listePizza);
-
-            // Ecriture de json dans un fichier de notre repertoire source
-
-            string path = "out";
-            string filename = "monfichierjson.json";
-
-            if (!File.Exists(path))
-            {
-                Directory.CreateDirectory(path);
-            }
-
-            string pathAndFilename = Path.Combine(path, filename);
-
-            File.WriteAllText(pathAndFilename, json);
-
-
-
-
-            // Lire le fichier "monfichierjson.json"
-            string jsonFichier = null;
-
-            try
-            {
-                jsonFichier = File.ReadAllText(pathAndFilename);
-            }
-            catch 
-            {
-                Console.WriteLine("Erreur de lecture du fichier : " + filename);
-                return;
-            }
-
-
-
-            // Deserialisation du fichier "monfichierjson.json" dans le repertoire
-            var jsonListePizza = new List<Pizza>();
-            try
-            {
-                jsonListePizza = JsonConvert.DeserializeObject<List<Pizza>>(jsonFichier);
-            }
-            catch 
-            {
-                Console.WriteLine( "Erreur : les données json ne sont pas valides" );
-                return;
-            }
-
-            
-
-            foreach (Pizza pizza in jsonListePizza)
-            {
-                pizza.Afficher();
-            }
-
-
 
             // Afficher les pizzas par ordre des prix
             //listePizza = listePizza.OrderBy(p => p.prix).ToList();
@@ -248,7 +187,6 @@ namespace projet_pizza
             }
             */
 
-
             // Afficher les pizzas vegetariennes
             //listePizza = listePizza.Where(p => p.vegetarienne).ToList();
 
@@ -257,6 +195,82 @@ namespace projet_pizza
             // Trier les pizza en fonction des ingredients
             //listePizza = listePizza.Where(p => p.ContientIngredient("tomate")).ToList();
 
+            return listePizza;
+        }
+
+
+
+        static List<Pizza> GetPizzaFromFile(string filename)
+        {
+            // le repertoire de stockage
+            string path = "out";
+
+            string pathAndFilename = Path.Combine(path, filename);
+
+            // Lire le fichier "monfichierjson.json"
+            string jsonFichier = null;
+
+            try
+            {
+                jsonFichier = File.ReadAllText(pathAndFilename);
+            }
+            catch
+            {
+                Console.WriteLine("Erreur de lecture du fichier : " + filename);
+                return null;
+            }
+
+
+
+            // Deserialisation du fichier "monfichierjson.json" dans le repertoire
+            List<Pizza> jsonListePizza = null;
+            try
+            {
+                jsonListePizza = JsonConvert.DeserializeObject<List<Pizza>>(jsonFichier);
+
+                return jsonListePizza;
+            }
+            catch
+            {
+                Console.WriteLine("Erreur : les données json ne sont pas valides");
+                return null;
+            }
+
+        }
+
+        static void GenerateJsonFile(List<Pizza> listePizza, string filename)
+        {
+            //Serialisation de la listePizza
+
+            string json = JsonConvert.SerializeObject(listePizza);
+
+            // Ecriture de json dans un fichier de notre repertoire source
+            // Creer le repertoire de stockage
+            string path = "out";
+            if (!File.Exists(path))
+            {
+                Directory.CreateDirectory(path);
+            }
+
+            string pathAndFilename = Path.Combine(path, filename);
+
+            File.WriteAllText(pathAndFilename, json);
+        }
+
+
+        static void Main(string[] args)
+        {
+            Console.OutputEncoding = Encoding.UTF8;
+
+            string filename = "pizzas.json";
+
+
+           //var listePizza = GetPizzaFromCode();
+
+           // GenerateJsonFile(listePizza,filename);
+
+           var listePizza = GetPizzaFromFile(filename);
+            
 
             foreach (Pizza pizza in listePizza)
             {
